@@ -4,11 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import com.control.Ping;
 
 public class MainForm extends JFrame {
     final private JComboBox<String> chatPersonComboBox;
     final private JButton  configButton;
-    final private JTextArea chatBox;
+    protected JTextArea chatBox;
     final private JTextField messageTextField;
     final private JButton sendButton;
     final private JButton connectDisconnectButton; // 合并为一个按钮
@@ -42,12 +43,24 @@ public class MainForm extends JFrame {
         connectDisconnectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!isConnected) {
-                    connect();
-                } else {
-                    disconnect();
-                }
+                // 执行ping操作
+                Ping ping = new Ping(chatBox,"www.baidu.com");
+                new SwingWorker<Void, String>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        ping.ping();
+                        return null;
+                    }
+                }.execute();
             }
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+////                if (!isConnected) {
+////                    connect();
+////                } else {
+////                    disconnect();
+////                }
+//            }
         });
         updateButtonState(false);
 
