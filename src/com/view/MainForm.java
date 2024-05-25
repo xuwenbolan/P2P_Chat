@@ -1,113 +1,90 @@
 package com.view;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.control.Ping;
+import com.model.User;
 
-public class MainForm extends JFrame {
-    final private JComboBox<String> chatPersonComboBox;
-    final private JButton  configButton;
+public class MainForm {
+    protected JFrame frame;
+    protected JPanel messagePanel;
+    protected JButton configButton;
     protected JTextArea chatBox;
-    final private JTextField messageTextField;
-    final private JButton sendButton;
-    final private JButton connectDisconnectButton; // 合并为一个按钮
+    protected JSplitPane centerSplitPanel; //分隔面板
+    protected JScrollPane userPanel,       //右边用户面板
+            messageBoxPanel; //左边消息框
+    protected JTextField messageTextField;
+    protected JButton sendButton;
+    protected JButton SwitchC_Button; // 合并为一个按钮
 
-    private boolean isConnected = false; // 跟踪连接状态
-    private boolean hasName = false; // 判断有无输入名字
-    private JButton serverConfigButton;
+    protected boolean isConnected = false; // 跟踪连接状态
+    protected JList userList;               //动态变化的用户列表
+    protected DefaultListModel<String> listModel;
+    protected JTextArea logTextArea;              //服务器日志
+
+    public static String Username = "User";
+    public static int Port = 9999;
+
+    public static ConcurrentHashMap<String, User> onlineUsers = new ConcurrentHashMap<String, User>();
 
     public MainForm() {
-        setTitle("聊天界面");
-        setSize(880, 700);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
+        frame = new JFrame("P2P Talk");
+        Toolkit kit = Toolkit.getDefaultToolkit(); // 定义工具包
+        Dimension screenSize = kit.getScreenSize(); // 获取屏幕的尺寸
+        int screenWidth = screenSize.width / 2; // 获取屏幕的宽
+        int screenHeight = screenSize.height / 2; // 获取屏幕的高
+        int width = 700;
+        int hight = 500;
+        frame.setBounds(screenWidth - width / 2, screenHeight - hight / 2, width, hight);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        ImageIcon icon = new ImageIcon("./res/img/icon.png");
+        this.frame.setIconImage(icon.getImage());
 
-        // 聊天人下拉选择框
-        chatPersonComboBox = new JComboBox<>();
-        chatPersonComboBox.addItem("聊天人1");
-        chatPersonComboBox.addItem("聊天人2");
-        chatPersonComboBox.addItem("聊天人3");
-        add(chatPersonComboBox, BorderLayout.NORTH);
+        //在线用户面板
+        listModel = new DefaultListModel<String>();
+        userList = new JList(listModel);
+        userPanel = new JScrollPane(userList);
+        userPanel.setBorder(new TitledBorder("在线用户"));  //设置在线用户面板标题
+        listModel.addElement("聊天人1");
+        listModel.addElement("聊天人2");
+        listModel.addElement("聊天人3");
 
-        // 按钮面板
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout());
-
-
-        configButton = new JButton("用户配置");
-
-        // 连接/断开按钮
-        connectDisconnectButton = new JButton("连接/断开");
-        connectDisconnectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 执行ping操作
-                Ping ping = new Ping(chatBox,"www.baidu.com");
-                new SwingWorker<Void, String>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        ping.ping();
-                        return null;
-                    }
-                }.execute();
-            }
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-////                if (!isConnected) {
-////                    connect();
-////                } else {
-////                    disconnect();
-////                }
-//            }
-        });
-        updateButtonState(false);
-
-        //配置按钮
-        buttonPanel.add(connectDisconnectButton);
-        buttonPanel.add(configButton);
-
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        // 聊天框
+        //接收消息面板
         chatBox = new JTextArea();
-        chatBox.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(chatBox);
-        add(scrollPane, BorderLayout.CENTER);
+        chatBox.setEditable(false);        //设置该区域不可编辑
+        chatBox.setForeground(Color.blue); //设置字体默认颜色为蓝色
+        messageBoxPanel = new JScrollPane(chatBox);   //设置为带滑动条的文本框
+        messageBoxPanel.setBorder(new TitledBorder("接收消息")); //设置标题
 
-        // 文本输入域和发送按钮
-        JPanel messagePanel = new JPanel();
-        JPanel messagePanel2 = new JPanel();
-        messagePanel.setLayout(new BorderLayout());
-        messagePanel2.setLayout(new FlowLayout());
+        //发送消息组件
+        configButton = new JButton("配置");
+        configButton.setBackground(Color.white);
 
-        messageTextField = new JTextField(20);
+        messageTextField = new JTextField();
         sendButton = new JButton("发送");
+        sendButton.setBackground(Color.white);
+        messagePanel = new JPanel(new BorderLayout());  //将组件放置在面板上
+        messagePanel.add(configButton,"West");
+        messagePanel.add(messageTextField, "Center");
+        messagePanel.add(sendButton, "East");
+        messagePanel.setBorder(new TitledBorder("发送消息"));
 
 
-        messagePanel.add(messagePanel2,BorderLayout.SOUTH);
-        messagePanel.add(chatPersonComboBox,BorderLayout.NORTH);
-        messagePanel2.add(messageTextField);
-        messagePanel2.add(sendButton);
-        add(messagePanel, BorderLayout.EAST);
+        //将中间在线用户面板与接收消息面板组合起来
+        centerSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, messageBoxPanel,userPanel );
+        centerSplitPanel.setDividerLocation(500);  //设置分隔线离左边100px
 
-        serverConfigButton = new JButton("服务器配置");
-        buttonPanel.add(serverConfigButton);
-        serverConfigButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showServerConfigDialog();
-            }
-        });
-
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                sendMessage();
-            }
-        });
+        frame.add(centerSplitPanel, "Center");
+        frame.add(messagePanel, "South");
         configButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -115,37 +92,11 @@ public class MainForm extends JFrame {
             }
         });
 
-        setVisible(true);
-    }
-    private void connect() {
-        // 连接逻辑
-        isConnected = true;
-        updateButtonState(true);
-        chatBox.append("已连接到聊天人: " + chatPersonComboBox.getSelectedItem() + "\n");
+        frame.setVisible(true);
     }
 
-    private void disconnect() {
-        // 断开逻辑
-        isConnected = false;
-        updateButtonState(false);
-        chatBox.append("已断开连接\n");
-    }
-
-    private void updateButtonState(boolean connected) {
-        if (connected) {
-            connectDisconnectButton.setText("断开");
-            connectDisconnectButton.setEnabled(true); // 根据需要启用或禁用按钮
-        } else {
-            connectDisconnectButton.setText("连接");
-            connectDisconnectButton.setEnabled(true); // 根据需要启用或禁用按钮
-        }
-    }
-    private void showServerConfigDialog() {
-        ServerConfigDialog serverConfigDialog = new ServerConfigDialog(MainForm.this);
-        serverConfigDialog.setVisible(true);
-    }
     private void showConfigDialog() {
-        ConfigDialog configDialog = new ConfigDialog(MainForm.this);
+        ConfigDialog configDialog = new ConfigDialog(this.frame);
         configDialog.setVisible(true);
     }
 
@@ -154,149 +105,19 @@ public class MainForm extends JFrame {
         // 发送消息逻辑
         String message = messageTextField.getText();
 
-            chatBox.append("我 :" + message + "\n");
+        chatBox.append("我 :" + message + "\n");
 
 
         messageTextField.setText(""); // 清空输入框
     }
-    public void broadcastToChatBox(String message) {
-        // 假设聊天框是多线程安全的，如果不是，你可能需要同步这个操作
-        chatBox.append("广播: " + message + "\n");
-    }
 
-    class ServerConfigDialog extends JDialog {
-        private JTextField maxUsersTextField;
-        private JTextField maxbroadcastTextField;
-        private JTextField portTextField;
-        private JButton startStopButton; // 启动/停止按钮
-        private JButton broadcastButton;//广播按钮
-        private JButton okButton;
-        private JButton cancelButton;
-        private boolean isRunning = false; // 跟踪服务是否正在运行
-        public ServerConfigDialog(Frame owner) {
-            super(owner, "服务器配置", true);
-            initComponents();
-            pack();
-            setLocationRelativeTo(owner);
-        }
-
-        private void initComponents() {
-            // 人数上限输入
-            JLabel maxUsersLabel = new JLabel("人数上限:");
-            maxUsersTextField = new JTextField(5);
-            maxbroadcastTextField=new JTextField(30);
-
-            // 端口号输入
-            JLabel portLabel = new JLabel("端口号:");
-            portTextField = new JTextField(5);
-
-            startStopButton = new JButton("启动");
-
-            startStopButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (!isRunning) {
-                        startServer();
-                    } else {
-                        stopServer();
-                    }
-                }
-            });
-            // 添加广播按钮
-            broadcastButton = new JButton("广播");
-            broadcastButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    broadcastMessage();
-                }
-            });
-
-            // 确定和取消按钮
-            okButton = new JButton("确定");
-            cancelButton = new JButton("取消");
-
-            // 按钮事件
-            okButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    onOk();
-                }
-            });
-            cancelButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    dispose();
-                }
-            });
-
-            // 布局
-            setLayout(new FlowLayout());
-            add(maxUsersLabel);
-            add(maxUsersTextField);
-            add(portLabel);
-            add(portTextField);
-            add(startStopButton);
-            add(maxbroadcastTextField);
-            add(broadcastButton);
-            add(okButton);
-            add(cancelButton);
-        }
-        private void startServer() {
-            // 启动服务器逻辑
-            isRunning = true;
-            updateStartStopButton(true);
-            // 这里可以添加代码来启动服务器
-            chatBox.append("服务器启动，端口号: " + portTextField.getText()+"\n");
-
-
-        }
-
-        private void stopServer() {
-            // 停止服务器逻辑
-            isRunning = false;
-            updateStartStopButton(false);
-            // 这里可以添加代码来停止服务器
-            chatBox.append("服务器停止\n");
-        }
-
-        private void updateStartStopButton(boolean running) {
-            if (running) {
-                startStopButton.setText("停止");
-                // 根据需要启用或禁用其他组件
-            } else {
-                startStopButton.setText("启动");
-                // 根据需要启用或禁用其他组件
-            }
-        }
-        private void onOk() {
-            // 获取输入值
-            String maxUsers = maxUsersTextField.getText();
-            String port = portTextField.getText();
-
-            // 这里可以添加代码来处理输入值，例如保存配置或更新UI
-            // 示例代码，实际应用中可能需要将配置保存到某个地方或应用到程序中
-            System.out.println("人数上限: " + maxUsers);
-            System.out.println("端口号: " + port);
-
-            // 关闭对话框
-            dispose();
-        }
-        private void broadcastMessage() {
-            // 假设我们有一个方法来获取要广播的消息内容
-            String broadcastContent = maxbroadcastTextField.getText();
-
-            // 调用广播消息的方法，这个方法需要你在ClientUI类中实现
-            // 这个方法将会把广播内容显示在聊天框中
-            broadcastToChatBox(broadcastContent);
-        }
-    }
     public class ConfigDialog extends JDialog {
 
-        private JTextField nameTextField;
-        private JTextField serverIpTextField;
+        public JTextField nameTextField;
         private JTextField portTextField;
         private JButton okButton;
         private JButton cancelButton;
+
 
         public ConfigDialog(JFrame owner) {
             super(owner, "配置", true);
@@ -304,23 +125,26 @@ public class MainForm extends JFrame {
             pack();
             setLocationRelativeTo(owner);
         }
+
         private void initComponents() {
             // 姓名输入
-            JLabel nameLabel = new JLabel("姓名:");
+            JLabel nameLabel = new JLabel("用户名:");
             nameTextField = new JTextField(10);
-
-
-            // 服务器IP输入
-            JLabel serverIpLabel = new JLabel("服务器IP:");
-            serverIpTextField = new JTextField(15);
+            nameTextField.setText(Username);
+//            nameTextField.setForeground(new Color(170, 170, 170)); // 浅灰色
 
             // 端口号输入
             JLabel portLabel = new JLabel("端口号:");
             portTextField = new JTextField(5);
+            portTextField.setDocument(new NumberDocument());
+            portTextField.setText(Integer.toString(Port));
+//            portTextField.setForeground(new Color(170, 170, 170)); // 浅灰色
 
             // 确定和取消按钮
             okButton = new JButton("确定");
+            okButton.setBackground(Color.white);
             cancelButton = new JButton("取消");
+            cancelButton.setBackground(Color.white);
 
 
             // 按钮事件
@@ -342,8 +166,6 @@ public class MainForm extends JFrame {
 
             add(nameLabel);
             add(nameTextField);
-            add(serverIpLabel);
-            add(serverIpTextField);
             add(portLabel);
             add(portTextField);
             add(okButton);
@@ -352,18 +174,68 @@ public class MainForm extends JFrame {
 
         private void onOk() {
             // 获取输入值
-            String name = nameTextField.getText();
-            String serverIp = serverIpTextField.getText();
-            String port = portTextField.getText();
+            String nameInput = nameTextField.getText().trim();
+            String portInput = portTextField.getText().trim();
 
-            // 这里可以添加代码来处理输入值，例如保存配置或更新UI
+            // 检查输入是否为空
+            if (nameInput.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "用户名不能为空。", "输入错误", JOptionPane.ERROR_MESSAGE);
+                return; // 退出onOk方法，不关闭对话框
+            }
+            if (portInput.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "端口号不能为空。", "输入错误", JOptionPane.ERROR_MESSAGE);
+                return; // 退出onOk方法，不关闭对话框
+            }
 
-            // 关闭对话框
-            dispose();
+            try {
+                // 尝试将端口号文本转换为整数
+                int portNumber = Integer.parseInt(portInput);
+                // 检查端口号是否在有效的范围内（例如0-65535）
+                if (portNumber < 0 || portNumber > 65535) {
+                    JOptionPane.showMessageDialog(this, "端口号必须在0到65535之间。", "输入错误", JOptionPane.ERROR_MESSAGE);
+                    return; // 退出onOk方法，不关闭对话框
+                }
+
+                // 如果输入有效，更新Username和Port变量
+                Username = nameInput;
+                Port = portNumber;
+
+                // ... 可以添加其他处理输入值的代码 ...
+
+                // 关闭对话框
+                dispose();
+            } catch (NumberFormatException e) {
+                // 端口号文本不是有效的整数
+                JOptionPane.showMessageDialog(this, "端口号必须为有效的整数。", "输入错误", JOptionPane.ERROR_MESSAGE);
+            }
         }
-}
+    }
 
-        public static void main(String[] args) {
+
+    public class NumberDocument extends PlainDocument {
+        public NumberDocument() {
+        }
+
+        public void insertString(int var1, String var2, AttributeSet var3) throws BadLocationException {
+            if (this.isNumeric(var2)) {
+                super.insertString(var1, var2, var3);
+            } else {
+                Toolkit.getDefaultToolkit().beep();
+            }
+
+        }
+
+        private boolean isNumeric(String var1) {
+            try {
+                Long.valueOf(var1);
+                return true;
+            } catch (NumberFormatException var3) {
+                return false;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

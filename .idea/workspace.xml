@@ -4,13 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e008d33-8a6a-4c4d-aa6d-ccccf1f1c9a4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/control/ClientControl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/control/Ping.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/control/ServerControl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/model/User.java" afterDir="false" />
+    <list default="true" id="1e008d33-8a6a-4c4d-aa6d-ccccf1f1c9a4" name="Changes" comment="ADD PING">
+      <change afterPath="$PROJECT_DIR$/src/Chat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/model/Message.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P2P_Chat.iml" beforeDir="false" afterPath="$PROJECT_DIR$/P2P_Chat.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/control/ClientControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/control/ClientControl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/control/ServerControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/control/ServerControl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/model/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/view/MainForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/view/MainForm.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,12 +29,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "xuwenbolan"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;xuwenbolan&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings">
     <option name="selectedUrlAndAccountId">
       <UrlAndAccount>
@@ -45,9 +46,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2gqjp6VpP9mIF0Y7amHdQIMPrSF" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -58,7 +59,10 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.ClientControl.executor": "Run",
+    "Application.ConfigForm.executor": "Run",
     "Application.MainForm.executor": "Run",
+    "Application.ServerControl.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
@@ -68,10 +72,10 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "http.proxy",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -89,7 +93,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1716432183343</updated>
-      <workItem from="1716432184434" duration="5081000" />
+      <workItem from="1716432184434" duration="14990000" />
+      <workItem from="1716563058981" duration="7604000" />
+      <workItem from="1716609856541" duration="12567000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <option name="closed" value="true" />
@@ -99,14 +105,34 @@
       <option name="project" value="LOCAL" />
       <updated>1716432499243</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="ADD PING">
+      <option name="closed" value="true" />
+      <created>1716446625936</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1716446625936</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Init" />
-    <option name="LAST_COMMIT_MESSAGE" value="Init" />
+    <MESSAGE value="ADD PING" />
+    <option name="LAST_COMMIT_MESSAGE" value="ADD PING" />
   </component>
 </project>
